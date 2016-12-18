@@ -11,8 +11,7 @@ public class TaskAssignerSimple extends TaskAssigner {
 
 	// 只发奇偶任务
 	
-	public TaskAssignerSimple(OnEventListener evnt)
-	{
+	public TaskAssignerSimple(OnEventListener evnt) {
 		evntMain = evnt;
 		cnt = new int[2];
 		cnt[1] = 1;
@@ -56,12 +55,13 @@ public class TaskAssignerSimple extends TaskAssigner {
 			postTask(p);
 			return;
 		}
+		// first available video fragment index;
 		int tmp = n;
-		for(int i = 0; i<n; ++i)
-		if(videoStatus[i] == 0)
-		{
-			tmp = i;
-			break;
+		for(int i = 0; i<n; ++i) {
+			if(videoStatus[i] == 0) {
+				tmp = i;
+				break;
+			}
 		}
 		/*
 		if(p.id == 0)
@@ -70,6 +70,7 @@ public class TaskAssignerSimple extends TaskAssigner {
 		if(tmp>=n)
 			return;
 		int no = tmp;
+		// status == 1 : task to do
 		videoStatus[tmp] = 1;
 		/*
 		if(cnt[p.id]>=n)
@@ -104,8 +105,7 @@ public class TaskAssignerSimple extends TaskAssigner {
 			map.put("url", videoInfo.get(p.nowTaskBit).url[p.nowTask]);
 			map.put("stTime", String.valueOf(System.currentTimeMillis()));
 		}
-		if(p.id==0)
-		{
+		if(p.id==0) {
 			// 如果是主机自己的话
 			evntMain.work(map);
 		}else
@@ -120,5 +120,4 @@ public class TaskAssignerSimple extends TaskAssigner {
 			return 0;
 		return videoInfo.get(lastBitrate).bitrate;
 	}
-
 }

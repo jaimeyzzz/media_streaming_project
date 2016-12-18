@@ -138,26 +138,36 @@ public class HttpDownloadModule {
 			public void run() {
 				try
 				{
-					stTime = System.currentTimeMillis();  
-					File fi = new File(fileName);
-					if(!fi.exists())
-						fi.createNewFile();
-					OutputStream outp  = new FileOutputStream(fi);
+					stTime = System.currentTimeMillis();
+
+					File targetFile = new File(fileName);
+					File parent = targetFile.getParentFile();
+					if(!parent.exists() && !parent.mkdirs()){
+						err("无法创建下载目录");
+						return;
+					}
+					if(!targetFile.exists() && !targetFile.createNewFile()) {
+						err("无法创建下载文件");
+						return;
+					}
+					OutputStream outp  = new FileOutputStream(targetFile);
 					if(tag!=-1)
 						ret.put("tag", String.valueOf(tag));
+
 					URL Url = new URL(url);
 					URLConnection conn = Url.openConnection();
 					conn.connect();
 					InputStream is = null;
 					is = conn.getInputStream();
+
 					int fileSize = conn.getContentLength();// 根据响应获	取文件大小
 					if (fileSize <= 0) { // 获取内容长度为0
 						err("无法获取文件大小");
 						return;
 					}
-						if (is == null) { // 没有下载流
-							err("无法打开下载流");
-							return;
+					if (is == null) { // 没有下载流
+						err("无法打开下载流");
+						return;
 					}
 		
 					byte buf[] = new byte[1024];
@@ -197,6 +207,7 @@ public class HttpDownloadModule {
 				}
 				catch(Exception e)
 				{
+					e.printStackTrace();
 					err("未截获的错误");
 				}
 			}

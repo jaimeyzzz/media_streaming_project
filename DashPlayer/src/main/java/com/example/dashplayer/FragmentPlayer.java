@@ -17,6 +17,7 @@ import com.appunite.ffmpeg.NotPlayingException;
 import com.example.dashplayer.common.OnEventListener;
 import com.example.dashplayer.common.VideoInfo;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
 import android.content.pm.ActivityInfo;
@@ -50,16 +51,20 @@ public class FragmentPlayer extends Fragment implements OnClickListener, FFmpegL
 	
 	View view;
 	
-	 @Override
-	    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-	        view = inflater.inflate(R.layout.frag_player, container, false);
-	        return view;
-	    }
-	 @Override
-	 public void onActivityCreated(Bundle bundle) {
-		 super.onActivityCreated(bundle);
-		 init();
-	 }
+	@Override
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		view = inflater.inflate(R.layout.frag_player, container, false);
+		return view;
+	}
+	@Override
+	public void onActivityCreated(Bundle bundle) {
+		super.onActivityCreated(bundle);
+		init();
+	}
+	/*@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+	}*/
 
 	Button btPlayer;
 
@@ -165,11 +170,14 @@ public class FragmentPlayer extends Fragment implements OnClickListener, FFmpegL
 	public int getBufferedLength()
 	{
 		int en = 0;
-		for(int i=nowPlaying;i<n;++i)
-			if(finLst[i]==1)
+		for(int i=nowPlaying;i<n;++i) {
+			if (finLst == null)
+				break;
+			if (finLst[i] == 1)
 				en = i;
 			else
 				break;
+		}
 		en = (en+1)*info.get(0).fragmentDuration;
 		int now = getNowPlayTime();
 		return en-now;
@@ -261,13 +269,21 @@ public class FragmentPlayer extends Fragment implements OnClickListener, FFmpegL
 			cnt = 0;
 			showSurface(surfaceView[0]);
 			showSurface(surfaceView[1]);
-			surfaceView[0].bringToFront();
+			this.getActivity().runOnUiThread(new Runnable(){
+				@Override
+				public void run() {
+					surfaceView[0].bringToFront();
+				}
+			});
+
+
 			nowPlaying = 0;
 			status = 0;
 			playLst = new String[n];
 			finLst = new int[n];
 			availableTruncQueue = new ArrayDeque<Integer>();
 		} catch (Exception ex) {
+			ex.printStackTrace();
 			Log.d("initPlayer", ex.getMessage());
 		}
 	}

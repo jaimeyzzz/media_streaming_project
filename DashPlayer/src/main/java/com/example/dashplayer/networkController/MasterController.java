@@ -35,7 +35,6 @@ import com.lichao.bluetooth.btbasic;
  */
 
 public class MasterController extends Logable implements OnEventListener {
-
 	static String path = "/storage/sdcard0/temporary/";
 	static String mpdPath = path + "play.mpd";
 //	public Integer downloading = -1;
@@ -96,9 +95,13 @@ public class MasterController extends Logable implements OnEventListener {
 		for(int i =0 ;i<httpDown.size();++i)
 			if(httpDown.get(i)!=null)
 			{
+				
 				int bas = spdLim / 3;
-				bas += (bas&1);
-				httpDown.get(i).setSpeedLim(spdLim + rand.nextInt(bas)-(bas/2+1));
+				if (bas != 0) {
+					bas += (bas&1);
+					httpDown.get(i).setSpeedLim(spdLim + rand.nextInt(bas)-(bas/2+1));
+				}
+
 			}
 		if( player.isPlaying() )
 			logdat(String.valueOf(nowBandwidth)+" "+String.valueOf(nowBandwidth2)+" "+String.valueOf(assigner.getSelectedBitrate()));
@@ -250,6 +253,7 @@ public class MasterController extends Logable implements OnEventListener {
 		HttpDownloadModule tmp = new HttpDownloadModule();
 		tmp.setSpeedLim(spdLim);
 		tmp.setTag(httpDownTag++);
+		loge(url);
 		tmp.downFile(url, location, this.onFileOutterDownloaded, false);
 		httpDown.add(tmp);
 		this.log("Task recv: "+me.nowTask+", BR:"+videoInfo.get(me.nowTaskBit).bitrate/1000+"k");
@@ -280,6 +284,7 @@ public class MasterController extends Logable implements OnEventListener {
 			String err = map.get("error");
 			if(!err.equals("false"))
 			{
+				loge(err);
 				if(location.endsWith(".mpd"))
 					loge("Failed to download mpd!");
 				else
@@ -320,7 +325,6 @@ public class MasterController extends Logable implements OnEventListener {
 					s += String.valueOf(videoInfo.get(i).bitrate);
 				}
 				logm( s+"]);" );
-				
 			}
 			else
 			{
@@ -357,9 +361,7 @@ public class MasterController extends Logable implements OnEventListener {
 			
 		}
 	};
-	
-	
-	
+
 	public void play(String url)
 	{
 		reset_everything();
@@ -420,6 +422,5 @@ public class MasterController extends Logable implements OnEventListener {
 			part.transTask = p.getInt("no");
 			part.transTaskBit = p.getInt("bitrate");
 		}
-			
 	}
 }

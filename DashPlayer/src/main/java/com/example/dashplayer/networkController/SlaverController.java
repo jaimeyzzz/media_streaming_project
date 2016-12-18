@@ -24,44 +24,44 @@ public class SlaverController extends Logable implements OnEventListener {
 
 	static String path = "/storage/sdcard0/temporary/";
 	static String mpdPath = path + "play.mpd";
-	
-	btbasic innet;
-	int now;
-	PartnerInfo me;
-	int status = 0;	// 0 : 未连接
-					// 1 : 已连接
-	
-	public PartnerInfo getInfo()
-	{
-		return me;
-	}
-	
-	Random rand = new Random();
-	
-	public SlaverController()
-	{
-		now = 1;
-		innet = new btbasic(this);
-		innet.tranpre("bt");
-		me = new PartnerInfo(0);
+
+			btbasic innet;
+			int now;
+			PartnerInfo me;
+			int status = 0;	// 0 : 未连接
+			// 1 : 已连接
+
+		public PartnerInfo getInfo()
+		{
+			return me;
+		}
+
+		Random rand = new Random();
+
+		public SlaverController()
+		{
+			now = 1;
+			innet = new btbasic(this);
+			innet.tranpre("bt");
+			me = new PartnerInfo(0);
 		/*
 		HttpDownloadModule tmp = new HttpDownloadModule();
 		tmp.downFile("http://192.168.1.222/medialab/sintel/400k/sintel_2048_2.mp4", "/storage/sdcard0/temporary/a2.mp4", this.onFileDownloaded, false);
 		httpDown.add(tmp);
 		*/
-	}
-	
-	ArrayList<HttpDownloadModule> httpDown = new ArrayList<HttpDownloadModule>();
-	XmlParser xmlParser = new XmlParser();
-//	VideoInfo videoInfo;
-	class DownloadedVideo
-	{
-		// 一个暂存信息用的结构
-		int no,bit;
-		long stTime;
-		String location;
-		public DownloadedVideo(int no,int bit,String location,long stTime)
+		}
+
+		ArrayList<HttpDownloadModule> httpDown = new ArrayList<HttpDownloadModule>();
+		XmlParser xmlParser = new XmlParser();
+		//	VideoInfo videoInfo;
+		class DownloadedVideo
 		{
+			// 一个暂存信息用的结构
+			int no,bit;
+			long stTime;
+			String location;
+			public DownloadedVideo(int no,int bit,String location,long stTime)
+			{
 			this.no = no;
 			this.bit = bit;
 			this.location = location;

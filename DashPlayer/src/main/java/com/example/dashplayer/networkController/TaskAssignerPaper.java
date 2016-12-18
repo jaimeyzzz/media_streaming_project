@@ -58,7 +58,6 @@ public class TaskAssignerPaper extends TaskAssigner {
 		if( 0 * fragmentDuration < delta && delta <= 0.2 * fragmentDuration)
 			return 15;
 		return 20;
-		
 	}
 	
 	public int getM( int k )
@@ -88,11 +87,10 @@ public class TaskAssignerPaper extends TaskAssigner {
 		}
 		int tmp = n;
 		for(int i = 0; i<n; ++i)
-		if(videoStatus[i] == 0)
-		{
-			tmp = i;
-			break;
-		}
+			if(videoStatus[i] == 0) {
+				tmp = i;
+				break;
+			}
 		if(tmp==n)
 			return;
 		int no = tmp;
@@ -155,5 +153,4 @@ public class TaskAssignerPaper extends TaskAssigner {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
 }

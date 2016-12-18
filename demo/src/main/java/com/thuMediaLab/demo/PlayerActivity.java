@@ -200,7 +200,8 @@ public class PlayerActivity extends Activity {
         logger = new LoggerTextviewMatlab(this, tLog);
         master = new MasterController(fragmentPlayer, me);
         master.bindOnLogEvent(logger);
-        master.setSpdLim(15);
+        //master.setSpdLim(15);
+		master.setSpdLim(15); // ljm add;
 		
 		plotBB = (SurfaceView) this.findViewById(R.id.playerSpeedPlot);
 		plotB = (SurfaceView) this.findViewById(R.id.playerBatteryPlot);
@@ -233,7 +234,7 @@ public class PlayerActivity extends Activity {
 			tProgress.purge();
 		}
 	    tProgress = new Timer();
-		master.play("http://192.168.1.222/medialab/sintel/test.mpd");
+		master.play("http://114.215.41.77/sintel/test.mpd");
 	    tProgress.schedule(new TimerTask(){
 			@Override
 			public void run() {
@@ -252,17 +253,16 @@ public class PlayerActivity extends Activity {
 					@Override
 					public void run() {
 						progress.setMax(tot);
-						progress.setProgress(now);	
+						progress.setProgress(now);
 						progress.setSecondaryProgress(buf + now);
 					}
 				});
 			}}, 0, 1000);
 
-		tSlowdown.schedule(new TimerTask(){
+		/*tSlowdown.schedule(new TimerTask(){
 			@Override
 			public void run() {
 				master.setSpdLim(50);
-			}}, 60000);
+			}}, 60000);*/
 	}
-
 }

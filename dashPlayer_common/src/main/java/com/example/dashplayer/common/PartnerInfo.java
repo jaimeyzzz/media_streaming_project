@@ -13,16 +13,14 @@ public class PartnerInfo {
 		this.id = id;
 	}
 	
-	public static PartnerInfo findPartnerById(ArrayList<PartnerInfo> lst, int no)
-	{
+	public static PartnerInfo findPartnerById(ArrayList<PartnerInfo> lst, int no) {
 		for(int i=0;i<lst.size();++i)
 			if(lst.get(i).id==no)
 				return lst.get(i);
 		return null;	
 	}
 
-	public void setId()
-	{
+	public void setId() {
 		id = partnerCnt++;
 	}
 

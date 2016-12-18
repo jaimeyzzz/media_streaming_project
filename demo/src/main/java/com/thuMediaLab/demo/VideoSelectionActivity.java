@@ -292,24 +292,24 @@ public class VideoSelectionActivity extends Activity {
 		getActionBar().setIcon(R.drawable.ic_media_video_poster);
 		lst = (ListView)findViewById(R.id.lstVideoSelection);
 
-		initData();
-		
-		adapter = new VideoListAdapter(this);
-		lst.setAdapter(adapter);
+	initData();
+
+	adapter = new VideoListAdapter(this);
+	lst.setAdapter(adapter);
 		/*
 		adapter = new SimpleAdapter(this, setData(), R.layout.listitem_video, new String[]{"img0","img1","img2","img3"}, new int[]{R.id.itemVideo0,R.id.itemVideo1,R.id.itemVideo2,R.id.itemVideo3});
 		lst.setAdapter(adapter);
 		lst.setOnItemClickListener(new OnItemClickListener() {
 			@Override
-	        public void onItemClick(AdapterView<?> parent, View view, int position, long id) 
+	        public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 	        {
 				me.setResult(1);
 				finish();
 	        }
 	    });
 	    */
-	}
-	
+}
+
 	void initDetail(View v, Map<String, Object> p)
 	{
 		((ImageView)v.findViewById(R.id.videoImg)).setImageResource((Integer)p.get("img"));
@@ -340,5 +340,4 @@ public class VideoSelectionActivity extends Activity {
 		getMenuInflater().inflate(R.menu.activity_video_selection, menu);
 		return true;
 	}
-
 }
