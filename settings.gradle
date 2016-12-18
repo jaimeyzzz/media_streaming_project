@@ -1,0 +1,5 @@
+include ':FFmpegLibrary'
+include ':dashPlayer_common'
+include ':transmitUnit'
+include ':DashPlayer'
+include ':demo'

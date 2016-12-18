@@ -1,0 +1,103 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".PlayerActivity" >
+
+    <LinearLayout
+        android:id="@+id/playerStatusLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="32dp"
+        android:orientation="vertical" >
+
+	       	<TextView
+	       	    android:id="@+id/textView3"
+	       	    android:layout_width="wrap_content"
+	       	    android:layout_height="wrap_content"
+	       	    android:layout_gravity="center_horizontal"
+	       	    android:gravity="center"
+	       	    android:text="Bandwidth"
+	       	    android:textAppearance="?android:attr/textAppearanceMedium" />
+	        
+	        <SurfaceView
+	            android:id="@+id/playerSpeedPlot"
+	            android:layout_width="272dp"
+	            android:layout_height="199dp" />
+
+	        <ImageView
+	            android:id="@+id/imageView1"
+	            android:layout_width="match_parent"
+	            android:layout_height="2dp"
+	            android:layout_marginTop="2dp"
+	            android:layout_marginBottom="2dp"
+	            android:background="@android:color/white"
+	            android:src="@android:drawable/alert_dark_frame" />
+
+	        <TextView
+	            android:id="@+id/textView2"
+	            android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_gravity="center_horizontal"
+	            android:gravity="center"
+	            android:text="Video Bitrate"
+	            android:textAppearance="?android:attr/textAppearanceMedium" />
+	        
+	        <SurfaceView
+	            android:id="@+id/playerBatteryPlot"
+	            android:layout_width="match_parent"
+	            android:layout_height="186dp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/tLog"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_gravity="bottom"
+                android:text=""
+                android:textAppearance="?android:attr/textAppearanceSmall" />
+
+        </ScrollView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/playerProgressLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_toLeftOf="@+id/playerStatusLayout"
+        android:gravity="center_vertical" >
+
+        <ProgressBar
+            android:id="@+id/playerProgress"
+            style="@android:style/Widget.Holo.Light.ProgressBar.Horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/button1"
+            style="?android:attr/buttonStyleSmall"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="FS" />
+    </LinearLayout>
+
+    <fragment
+        android:id="@+id/fragPlayer"
+        android:name="com.example.dashplayer.FragmentPlayer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/playerProgressLayout"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_toLeftOf="@+id/playerStatusLayout" />
+
+</RelativeLayout>

@@ -1,0 +1,46 @@
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="0px"
+    android:paddingLeft="0px"
+    android:paddingRight="0px"
+    android:paddingTop="0px"
+    tools:context=".MainActivity"
+    android:background="#000000" >
+
+        <com.appunite.ffmpeg.FFmpegSurfaceView
+            android:id="@+id/surfaceView0"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+
+        <com.appunite.ffmpeg.FFmpegSurfaceView
+            android:id="@+id/surfaceView1"
+            android:layout_width="50dp"
+            android:layout_height="50dp" />
+<!-- 
+        <VideoView
+            android:id="@+id/videoView1"
+            android:layout_width="200dp"
+            android:layout_height="92dp"
+            android:layout_x="48dp"
+            android:layout_y="196dp" />
+
+        <VideoView
+            android:id="@+id/videoView0"
+            android:layout_width="200dp"
+            android:layout_height="92dp"
+            android:layout_x="59dp"
+            android:layout_y="82dp" />
+ -->
+
+        <Button
+            android:id="@+id/btPlay_"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_x="127dp"
+            android:layout_y="82dp"
+            android:text="play"
+            android:visibility="gone" />
+
+</AbsoluteLayout>

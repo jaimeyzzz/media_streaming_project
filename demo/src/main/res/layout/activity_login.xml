@@ -1,0 +1,146 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#00A2E8"
+    android:orientation="vertical"
+    tools:context=".LoginActivity" >
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_weight="20"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="10" />
+
+    <ImageView
+        android:id="@+id/imageView2"
+        android:layout_width="180dp"
+        android:layout_height="180dp"
+        android:background="@drawable/logo" />
+    
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Decomod - demo for MMSYS 2014"
+        android:textColor="@android:color/white"
+        android:textSize="25dp" >
+    </TextView>
+    
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+    </LinearLayout>
+ 
+    <LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:layout_weight="1">
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="20" />
+
+     <ImageView
+         android:id="@+id/imageView1"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:src="@drawable/neku" />
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
+    
+         <LinearLayout
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:orientation="vertical">
+          <AutoCompleteTextView
+           android:id="@+id/autoCompleteTextView1"
+           android:layout_width="155dp"
+           android:layout_height="50dp"
+           android:text="Username"
+           android:layout_marginTop="0dp"
+           android:ems="10" >
+           <requestFocus />
+           </AutoCompleteTextView>
+         <AutoCompleteTextView
+           android:id="@+id/AutoCompleteTextView01"
+           android:layout_width="155dp"
+           android:layout_height="50dp"
+           android:text="Password"
+           android:layout_marginTop="0dp"
+           android:ems="10"
+           android:inputType="textPassword" />
+       </LinearLayout>   
+  
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="20" />
+    
+     </LinearLayout>   
+      
+
+    <LinearLayout
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="horizontal"
+    android:layout_weight="1" >
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="22" />  
+
+    <Button
+        android:id="@+id/btSignup"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_below="@+id/AutoCompleteTextView01"
+        android:layout_toLeftOf="@+id/btLogin"
+        android:background="@drawable/buttonsignup"
+        android:textSize="20sp" />
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="3" />
+    <Button
+        android:id="@+id/btLogin"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:textSize="20sp"
+        android:background="@drawable/buttonimage"
+        android:layout_marginTop="0dp"
+         />
+    
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="22" />
+     </LinearLayout> 
+      <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="10"
+         />
+   
+<com.thuMediaLab.demo.GameViewOK
+    android:id="@+id/GameViewOKView1"
+    android:layout_width="match_parent"
+    android:layout_height="300dp"
+    android:layout_marginTop="-300dp"
+    android:layout_weight="5"
+    />
+
+    </LinearLayout>

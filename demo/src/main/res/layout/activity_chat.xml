@@ -1,0 +1,49 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ChatActivity"
+    android:background="@drawable/dumb_bkg" >
+
+    <ListView
+        android:id="@+id/lstChat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+		android:stackFromBottom="true"
+		android:transcriptMode="alwaysScroll"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="80dp" >
+
+        <AutoCompleteTextView
+            android:textColor="#FFFFFF"
+            android:id="@+id/tChatContent"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:ems="10"
+            android:text="AutoCompleteTextView" >
+
+            <requestFocus />
+        </AutoCompleteTextView>
+
+        <Button
+            android:textColor="#FFFFFF"
+            android:id="@+id/btChatSend"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Send" />
+
+        <Button
+            android:textColor="#FFFFFF"
+            android:id="@+id/btChatVideo"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:text="Video" />
+
+    </LinearLayout>
+
+</LinearLayout>
