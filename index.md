@@ -43,7 +43,7 @@ $$r_v = \sum_{i=1}^{M}{r_i}$$
 当$\exists r_i$满足$r_i\notin \mathbb{Q}, r_i \in \mathbb{R}$，该问题无解。
 
 构造方法如下，
-对所有的$r_i \in \mathbb(Q)$，找到一个最小的$K \in \mathbb{N}$ 将他们化为整数$K r_i$。
+对所有的$r_i \in \mathbb{Q}$，找到一个最小的$K \in \mathbb{N}$ 将他们化为整数$K r_i$。
 我们定义一个下载时间段
 
 $$ T_{peroid} = T K \sum_{i = 1}^{M}{r_i} = T K r_v $$
