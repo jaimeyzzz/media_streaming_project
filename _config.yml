@@ -1,2 +1,5 @@
 theme: jekyll-theme-minimal
 markdown: kramdown
+tex2jax: {
+  skipTags: ["script","noscript","style","textarea","pre"]
+}
