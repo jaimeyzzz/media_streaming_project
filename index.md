@@ -18,7 +18,7 @@ layout: default
 
 # 流媒体实验三：带宽聚合和分享
 
-2016310592 卢嘉铭
+卢嘉铭 夏江月
 
 带宽聚合与分享
 
@@ -95,7 +95,7 @@ $$ T_{delay} \geq MT $$
 计算下载的码率时使用如下函数，防止波动。
 缓慢上涨，迅速下降的方法减少因为码率切换带来卡顿的可能性。
 \begin{eqnarray}
-& tmp = e^{p (T_{buffer} - 30)} \\\\
+& tmp = e^{p (T_{buffer} - 30)} \\
 & f = \frac{tmp}{1 - tmp}
 \end{eqnarray}
 
