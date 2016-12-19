@@ -2,6 +2,7 @@
 layout: default
 ---
 
+
 # 流媒体实验三介绍
 
 2016310592 卢嘉铭
@@ -11,6 +12,15 @@ layout: default
 # 任务分配算法
 
 ## 理论计算
+
+有N个视频分段，每个视频分段长度为T，有M个设备，每个设备的下载速率为$r_i, i=1,...,M$。
+其中$r_0 > r_1 > ... > r_M$。
+视频分段的码率为$r_v$。考虑$$r_v = \sum_{i=1}^{M}{r_i}$$
+
+证明或证否：存在某种分配算法，使得经过一定延迟之后，视频能够无卡顿播放。可考虑$N = \infty$。
+
+若上述假设成立，找到上述算法，并得出获得最小延迟的分配方案。
+若假设不成立，找到使得卡顿时间最小的分配方案。
 
 ## 算法
 
@@ -136,3 +146,13 @@ Long, single-line code blocks should not wrap. They should horizontally scroll i
 ```
 The final element.
 ```
+
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        tex2jax: {inlineMath: [['$', '$']]},
+        messageStyle: "none"
+    });
+</script>
