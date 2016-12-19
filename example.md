@@ -2,24 +2,9 @@
 layout: default
 ---
 
-# 流媒体实验三介绍
-
-2016310592 卢嘉铭
-
-带宽聚合与分享
-
-# 任务分配算法
-
-## 理论计算
-
-## 算法
-
-# 实现
-
-## Demo
-
-
 Text can be **bold**, _italic_, or ~~strikethrough~~.
+
+[Link to another page](another-page).
 
 There should be whitespace between paragraphs.
 
