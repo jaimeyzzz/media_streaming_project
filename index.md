@@ -4,21 +4,17 @@ layout: default
 
 <script type="text/x-mathjax-config">
     MathJax.Hub.Config({
-        TeX: {
-          equationNumbers: {
-            autoNumber: "AMS"
-          }
-        },
         tex2jax: {
           skipTags: ["script","noscript","style","textarea","pre"],
           inlineMath: [ ['$','$'], ['\(', '\)'] ],
-          displayMath: [ ['$$','$$'] ],
-          processEscapes: true,
-        }，
+          displayMath: [ ['$$','$$'] ]
+        },
         messageStyle: "none"
     });
 </script>
-<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
 
 # 流媒体实验三介绍
 
