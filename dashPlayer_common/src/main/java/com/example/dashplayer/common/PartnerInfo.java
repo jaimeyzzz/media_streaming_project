@@ -8,13 +8,14 @@ public class PartnerInfo {
 	
 	private static int partnerCnt = 0;
 
-	public PartnerInfo(int id)
-	{
+	public PartnerInfo(int id) {
 		this.id = id;
+		this.outBandWidth = -1;
+		this.workStatus = 0;
 	}
 	
 	public static PartnerInfo findPartnerById(ArrayList<PartnerInfo> lst, int no) {
-		for(int i=0;i<lst.size();++i)
+		for (int i=0;i<lst.size();++i)
 			if(lst.get(i).id==no)
 				return lst.get(i);
 		return null;	
@@ -35,6 +36,6 @@ public class PartnerInfo {
 	public int transTaskBit;	// 正在传输的任务的码率
 	public int mpdAcked;		// 对方是否已经有mpd信息
 	public long stTime;		// 任务的开始时间
-	
+	public int workStatus; // 1 downloading 0 free;
 }
  

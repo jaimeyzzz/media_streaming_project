@@ -73,14 +73,14 @@ public class MasterControllerDumb extends MasterController {
 	// 即在网络端就已经生成了PartnerInfo，使得能够得到其中的Socket和连接类型
 	void onNewDeviceConnected(InfoPack p) {
 		log("收到从机连入。");
-		innet.matchIdThd(top, p.get("mac"));	//step 3, included informid
-		PartnerInfo tmp = new PartnerInfo(top);
-		partner.put(String.valueOf(top),tmp);
-		PartnerInfo part = partner.get(String.valueOf(top));
+		btNet.matchIdThd(partnerCount, p.get("mac"));	//step 3, included informid
+		PartnerInfo tmp = new PartnerInfo(partnerCount);
+		partner.put(String.valueOf(partnerCount),tmp);
+		PartnerInfo part = partner.get(String.valueOf(partnerCount));
 		part.transTask = 1;
 		part.transTaskBit = 0;
-		innet.setSavePath(top, path+"a"+String.valueOf(part.transTask)+".mp4");
-		top++;
+		btNet.setSavePath(partnerCount, path+"a"+String.valueOf(part.transTask)+".mp4");
+		partnerCount++;
 	}
 	
 	// 当设备与主机中断连接时
@@ -117,20 +117,20 @@ public class MasterControllerDumb extends MasterController {
 		if(id!=0)
 			return;*/
 		String url = info.get("url");
-		me.nowTask = Integer.valueOf(info.get("no"));
-		me.nowTaskBit = Integer.valueOf(info.get("bitrate"));
-		String location = path + me.id + "_" + me.nowTask + "_" + me.nowTaskBit + ".mp4";
+		localHost.nowTask = Integer.valueOf(info.get("no"));
+		localHost.nowTaskBit = Integer.valueOf(info.get("bitrate"));
+		String location = path + localHost.id + "_" + localHost.nowTask + "_" + localHost.nowTaskBit + ".mp4";
 		HttpDownloadModule tmp = new HttpDownloadModule();
 		tmp.setTag(httpDownTag++);
 		tmp.downFile(url, location, this.onFileOutterDownloaded, false);
 		httpDown.add(tmp);
-		this.log("收到任务"+me.nowTask+"，码率"+videoInfo.get(me.nowTaskBit).bitrate/1000+"k");
+		this.log("收到任务"+localHost.nowTask+"，码率"+videoInfo.get(localHost.nowTaskBit).bitrate/1000+"k");
 	}
 	
 	void downloadMpd()
 	{
-		me.nowTask = -1;
-		me.nowTaskBit = -1;
+		localHost.nowTask = -1;
+		localHost.nowTaskBit = -1;
 		String location = mpdPath;
 		HttpDownloadModule tmp = new HttpDownloadModule();
 		tmp.setTag(httpDownTag++);
@@ -177,7 +177,7 @@ public class MasterControllerDumb extends MasterController {
 					loge("mpd解析失败：不正确的mpd！");
 					return;
 				}
-				me.mpdAcked = 1;
+				localHost.mpdAcked = 1;
 				downloadRecord = new TimePair[videoInfo.get(0).url.length];
 				assigner.downloadRecordBinder(downloadRecord);
 				player.setInfo(videoInfo);
@@ -196,7 +196,7 @@ public class MasterControllerDumb extends MasterController {
 			}
 			else
 			{
-				no = me.nowTask;
+				no = localHost.nowTask;
 				player.onNewTruncAvailable(no,location);
 				downloadRecord[no].bufEnTime = player.getBufferedLength();
 				downloadRecord[no].enTime = System.currentTimeMillis();
@@ -205,7 +205,7 @@ public class MasterControllerDumb extends MasterController {
 			}
 			int speed = Integer.valueOf(map.get("speed"));
 			log("下载完成，速度是"+(speed/1024)+"Kb/s");
-			assigner.assignTask(me);
+			assigner.assignTask(localHost);
 		}
 	};
 	
@@ -272,7 +272,7 @@ public class MasterControllerDumb extends MasterController {
 			PartnerInfo part = partner.get(p.get("id"));
 			player.onNewTruncAvailable(part.transTask, local);
 			part.transTask += 2;
-			innet.setSavePath(part.id, path+"a"+String.valueOf(part.transTask)+".mp4");
+			btNet.setSavePath(part.id, path+"a"+String.valueOf(part.transTask)+".mp4");
 		}
 		if(cmd.equals(Commands.notify))
 			log(p.get("txt"));
@@ -287,7 +287,7 @@ public class MasterControllerDumb extends MasterController {
 			int id = Integer.valueOf(p.get("id"));
 			String path = p.get("location");
 			log("准备蓝牙接收：" + String.valueOf(id) + "@" + path);
-			innet.setSavePath(id, path);
+			btNet.setSavePath(id, path);
 			PartnerInfo part = partner.get(String.valueOf(id));
 			part.transTask = p.getInt("no");
 			part.transTaskBit = p.getInt("bitrate");

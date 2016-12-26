@@ -2,7 +2,9 @@ package com.example.dashplayer.networkController;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.Random;
@@ -36,99 +38,132 @@ import com.lichao.bluetooth.btbasic;
 
 public class MasterController extends Logable implements OnEventListener {
 	static String path = "/storage/sdcard0/temporary/";
-	static String mpdPath = path + "play.mpd";
+	static String mpdPath = path + "temp.mpd";
+	static String mpdUrl = "http://114.215.41.77/sintel/test.mpd";
+	static int maxTruncNum = 1000000;
+	static int minDownloadSpeed = 10;
 //	public Integer downloading = -1;
-	int top;
-	public PartnerMap partner;
-	PartnerInfo me;
-	TaskAssigner assigner = new TaskAssignerSimple(this);
+
+	/* partner info */
+	int partnerCount = 0;
+	public PartnerMap partner = new PartnerMap();
+	public ArrayList<String> partnerAvail = new ArrayList<String>();
+	class SortPartnerAvail implements Comparator {
+		public int compare(Object o1, Object o2) {
+			int s1 = partner.get((String)o1).outBandWidth;
+			int s2 = partner.get((String)o2).outBandWidth;
+			if (s1 == -1) {
+				return (s2 == -1) ? 0 : 1;
+			}
+			if (s2 == -1) {
+				return 0;
+			}
+			if (s1 > s2)
+				return 1;
+			return 0;
+		}
+	}
+	PartnerInfo localHost;
+
+	/* video info */
+	VideoInfo videoInfo;
+	int n;	// 视频的trunk数
+	int targetLim = 0;
+
+	TaskAssigner assigner;
 	FragmentPlayer player;
-	String mpdUrl;
 	int httpDownTag = 0;
-	Random rand = new Random();
+	
 	TimePair[] downloadRecord;
 	BatteryUtilities battery;
 	int nowBandwidth, nowBandwidth2;
-	btbasic innet;	// inner network transmit obj
 	
-	
-	ArrayList<HttpDownloadModule> httpDown = new ArrayList<HttpDownloadModule>();	//用来保存已经下载完成的下载模块对象 严格按照下载完成时间排序
-	ArrayList<HttpDownloadModule> httpDownloaded = new ArrayList<HttpDownloadModule>();	// 正在下载或者还没有开始下载的对象
+	// other initial classes;
+	Random rand = new Random();
+	ArrayList<HttpDownloadModule> httpDown = new ArrayList<HttpDownloadModule>(); //用来保存已经下载完成的下载模块对象 严格按照下载完成时间排序
+	ArrayList<HttpDownloadModule> httpDownloaded = new ArrayList<HttpDownloadModule>(); // 正在下载或者还没有开始下载的对象
 	XmlParser xmlParser = new XmlParser();
-	VideoInfo videoInfo;
-	int n;	// 视频的trunk数
-	Timer heartbeat;
-	int targetLim = 0;
+	Timer heartbeat = new Timer();
+	btbasic btNet;	// inner network transmit obj
+	
 
 	// 主机端需要绑定一个播放器
-	public MasterController(FragmentPlayer _player, Activity activity)
-	{
-		top = 1;
-		innet = new btbasic(this);
-		innet.tranpre("bt");
-		partner = new PartnerMap();
+	public MasterController(FragmentPlayer _player, Activity activity) {
+		btNet = new btbasic(this);
+		btNet.tranpre("bt");
 		battery = new BatteryUtilities(activity);
 		player = _player;
-		assigner.playerBinder(_player);
+
+		assigner = new TaskAssignerCourse(this);
+		assigner.playerBinder(player);
 		assigner.partnerBinder(partner);
-		assigner.networkBinder(innet);
-		me = new PartnerInfo(0);
-//		me.onFileRecv = onFileInnerDownloaded;
-		partner.put("0", me);
-		heartbeat = new Timer();
+		assigner.networkBinder(btNet);
+		assigner.partnerAvailBinder(partnerAvail);
+//		localHost.onFileRecv = onFileInnerDownloaded;		
+
+		// TODO : create path directory;
+		// add localhost as a partner
+        partnerCount = 0;
+		localHost = new PartnerInfo(partnerCount);
+		partner.put(String.valueOf(partnerCount), localHost);
+        partnerCount ++;
+
 		heartbeat.schedule(new TimerTask(){
 			@Override
 			public void run() {
 				onHeartBeat();
 			}
-		},0,1000);
+		}, 0, 1000);
 		log("Master device deployed.");
 	}
 	
 	float batteryLevel;
 	
-	public void onHeartBeat()
-	{
+	public void onHeartBeat() {
 		spdLim += (targetLim - spdLim)/2+(targetLim - spdLim)%2;
 		int bw = estimateTotBandwidth(); 
 		batteryLevel = battery.getBatteryPercent();
-		for(int i =0 ;i<httpDown.size();++i)
-			if(httpDown.get(i)!=null)
-			{
-				
+		for (int i = 0; i < httpDown.size(); ++i) {
+			if (httpDown.get(i) != null) {
 				int bas = spdLim / 3;
 				if (bas != 0) {
-					bas += (bas&1);
-					httpDown.get(i).setSpeedLim(spdLim + rand.nextInt(bas)-(bas/2+1));
+					bas += (bas & 1);
+					httpDown.get(i).setSpeedLim(spdLim + rand.nextInt(bas) - (bas / 2 + 1));
 				}
-
 			}
-		if( player.isPlaying() )
+		}
+		if (player.isPlaying())
 			logdat(String.valueOf(nowBandwidth)+" "+String.valueOf(nowBandwidth2)+" "+String.valueOf(assigner.getSelectedBitrate()));
-		for(Entry<String, PartnerInfo> p : partner.entrySet())
+		for (Entry<String, PartnerInfo> p : partner.entrySet())
 			if(p.getValue().id!=0)
-				innet.sendTrash(p.getValue().id);
+				btNet.sendTrash(p.getValue().id);
+
+		// TODO : change fragment status when network changed;
+		/*for (int i = 0; i < partnerAvail.size(); i ++) {
+            PartnerInfo p = partner.get(partnerAvail.get(i));
+            if (p.outBandWidth != -1 && p.outBandWidth < minDownloadSpeed) {
+                if (p.nowTask >= 0)
+                    assigner.videoStatus[p.nowTask] = 0;
+            }
+        }*/
 	}
 	
-	public int getBatteryLevel()
-	{
-		return (int)(battery.getBatteryPercent()*100);
+	public int getBatteryLevel() {
+		return (int)(battery.getBatteryPercent() * 100);
 	}
 
-	public int estimateTotBandwidth()
-	{
+	public int estimateTotBandwidth() {
 		int tot = 0;
 		int btSpeed = 0;
 		for(int i=0;i<httpDown.size();++i)
 			tot += httpDown.get(i).getNowSpeed();
 		int innerSpd = 0;
 		Iterator<Entry<String, PartnerInfo>> i = partner.entrySet().iterator();
-		while(i.hasNext())
-		{
+		while(i.hasNext()) {
 			Entry<String, PartnerInfo> p = i.next();
 			innerSpd += p.getValue().outBandWidth;
 		}
-		btSpeed = innet.getSpeed();
+		btSpeed = btNet.getSpeed();
 		log("http:"+tot+";inner:"+innerSpd);
 		assigner.notifyBandwidth(tot +  innerSpd);
 		nowBandwidth = tot;
@@ -157,11 +192,9 @@ public class MasterController extends Logable implements OnEventListener {
 		return player.getBufferedLength();
 	}
 	
-	public void reset_everything()
-	{
+	public void reset_everything() {
 		Iterator<Entry<String, PartnerInfo>> i = partner.entrySet().iterator();
-		while(i.hasNext())
-		{
+		while(i.hasNext()) {
 			PartnerInfo p = i.next().getValue();
 			p.mpdAcked = 0;
 			/*
@@ -180,16 +213,19 @@ public class MasterController extends Logable implements OnEventListener {
 	}
 	
 	///////////////// 从机 /////////////////////
-	
 	// 要求能够得到接入的设备的PartnerInfo，其中包含了连接的信息
 	// 即在网络端就已经生成了PartnerInfo，使得能够得到其中的Socket和连接类型
 	void onNewDeviceConnected(InfoPack p) {
 		log("Slaver joined.");
-		innet.matchIdThd(top, p.get("mac"));	//step 3, included informid
-		PartnerInfo tmp = new PartnerInfo(top);
-		partner.put(String.valueOf(top),tmp);
-		assigner.assignTask(tmp);
-		top++;
+		btNet.matchIdThd(partnerCount, p.get("mac"));	//step 3, included informid
+		String partnerId = String.valueOf(partnerCount);
+		partner.put(partnerId, new PartnerInfo(partnerCount));
+        partnerCount ++;
+
+		partnerAvail.add(partnerId);
+		Collections.sort(partnerAvail, new SortPartnerAvail());
+		assigner.setKeyFragment(player.nowPlaying + partnerAvail.size());
+		assigner.assignTask(partner.get(partnerId));
 	}
 	
 	// 当设备与主机中断连接时
@@ -197,12 +233,14 @@ public class MasterController extends Logable implements OnEventListener {
 		log("Lost connection: #" + p.get("id"));
 		assigner.onPartnerLost(p.get("id"));
 		partner.remove(p.get("id"));
+		partnerAvail.remove(p.get("id"));
 	}
 	
 	// 当从机完成任务下载时
 	void onSlaverTaskFinished( InfoPack info ) {
 		String id = info.get("id");
 		PartnerInfo p = partner.get(id);
+		p.workStatus = 0;
 		assigner.assignTask(p);
 	}
 	
@@ -247,22 +285,21 @@ public class MasterController extends Logable implements OnEventListener {
 		if(id!=0)
 			return;*/
 		String url = info.get("url");
-		me.nowTask = Integer.valueOf(info.get("no"));
-		me.nowTaskBit = Integer.valueOf(info.get("bitrate"));
-		String location = path + me.id + "_" + me.nowTask + "_" + me.nowTaskBit + ".mp4";
+		localHost.nowTask = Integer.valueOf(info.get("no"));
+		localHost.nowTaskBit = Integer.valueOf(info.get("bitrate"));
+		String location = path + localHost.id + "_" + localHost.nowTask + "_" + localHost.nowTaskBit + ".mp4";
 		HttpDownloadModule tmp = new HttpDownloadModule();
 		tmp.setSpeedLim(spdLim);
 		tmp.setTag(httpDownTag++);
-		loge(url);
 		tmp.downFile(url, location, this.onFileOutterDownloaded, false);
 		httpDown.add(tmp);
-		this.log("Task recv: "+me.nowTask+", BR:"+videoInfo.get(me.nowTaskBit).bitrate/1000+"k");
+		this.log("Task recv: "+ localHost.nowTask+", BR:"+videoInfo.get(localHost.nowTaskBit).bitrate/1000+"k");
 	}
 	
 	void downloadMpd()
 	{
-		me.nowTask = -1;
-		me.nowTaskBit = -1;
+		localHost.nowTask = -1;
+		localHost.nowTaskBit = -1;
 		String location = mpdPath;
 		HttpDownloadModule tmp = new HttpDownloadModule();
 		tmp.setTag(httpDownTag++);
@@ -310,10 +347,12 @@ public class MasterController extends Logable implements OnEventListener {
 					loge("invalid mpd!");
 					return;
 				}
-				me.mpdAcked = 1;
+				localHost.mpdAcked = 1;
+				n = videoInfo.get(0).url.length;
 				downloadRecord = new TimePair[videoInfo.get(0).url.length];
 				assigner.downloadRecordBinder(downloadRecord);
 				player.setInfo(videoInfo);
+
 				assigner.videoInfoBinder(videoInfo);
 				
 				// 写入matlab
@@ -328,7 +367,7 @@ public class MasterController extends Logable implements OnEventListener {
 			}
 			else
 			{
-				no = me.nowTask;
+				no = localHost.nowTask;
 				player.onNewTruncAvailable(no,location);
 				downloadRecord[no].bufEnTime = player.getBufferedLength();
 				downloadRecord[no].enTime = System.currentTimeMillis();
@@ -337,7 +376,7 @@ public class MasterController extends Logable implements OnEventListener {
 			}
 			int speed = Integer.valueOf(map.get("speed"));
 			log("Downloaded. spd:"+(speed/1024)+"KB/s");
-			assigner.assignTask(me);
+			assigner.assignTask(localHost);
 		}
 	};
 	
@@ -358,18 +397,26 @@ public class MasterController extends Logable implements OnEventListener {
 			downloadRecord[no].dat = Integer.valueOf(map.get("byte"));
 			downloadRecord[no].speed = Integer.valueOf(map.get("speed"));
 			downloadRecord[no].bufEnTime = player.getBufferedLength();
-			
 		}
 	};
 
 	public void play(String url)
 	{
 		reset_everything();
+		assigner.setKeyFragment(0);
 		mpdUrl = url;
-		Iterator<Entry<String, PartnerInfo>> i = partner.entrySet().iterator();
-		while(i.hasNext())
-		{
-			PartnerInfo p = i.next().getValue();
+		Iterator<Entry<String, PartnerInfo>> partnerIter = partner.entrySet().iterator();
+		while (partnerIter.hasNext()) {
+			String partnerId = partnerIter.next().getKey();
+			PartnerInfo p = partner.get(partnerId);
+			int outSpeed = p.outBandWidth;
+			if (outSpeed != 0) {
+				partnerAvail.add(partnerId);
+			}
+		}
+		Collections.sort(partnerAvail, new SortPartnerAvail());
+		for (int i = partnerAvail.size() - 1; i >= 0; i --) {
+			PartnerInfo p = partner.get(partnerAvail.get(i));
 			assigner.assignTask(p);
 		}
 	}
@@ -380,44 +427,40 @@ public class MasterController extends Logable implements OnEventListener {
 		// 当蓝牙事件触发的时候
 		InfoPack p = (InfoPack)param;
 		String cmd = p.get("cmd");
-		if(cmd.equals(Commands.bluetoothInfoReceived))
-		{
+		if (cmd.equals(Commands.bluetoothInfoReceived)) {
 			p.put("cmd", p.get("cmd_"));
 			work(p);
 		}
 		
-		if(cmd.equals(Commands.connLost))
+		if (cmd.equals(Commands.connLost))
 			this.onDisconnected(p);
-		if(cmd.equals(Commands.slaverConnected))
+		if (cmd.equals(Commands.slaverConnected))
 			this.onNewDeviceConnected(p);
-		if(cmd.equals(Commands.taskFinished))
-		{
+		if (cmd.equals(Commands.taskFinished)) {
 			// 从外网 ( from externet )
 			log("downloaded.");
 		}
-		if(cmd.equals(Commands.bluetoothReceived))	// 当已经接受(bluetoothReceived)
-		{
+		if (cmd.equals(Commands.bluetoothReceived))	{ // 当已经接受(bluetoothReceived)
 			String local =  p.get("path");
 			log("BT received:" + local);
 			PartnerInfo part = partner.get(p.get("id"));
 			player.onNewTruncAvailable(part.transTask, local);
 		}
-		if(cmd.equals(Commands.notify))
-			log(p.get("txt"));
-		if( cmd.equals(Commands.heartBeat))
+		if (cmd.equals(Commands.notify))
+			log(p.get("txt")); else
+		if (cmd.equals(Commands.heartBeat))
 			onHeartBeat(p);	else
-		if( cmd.equals(Commands.taskFinished))
+		if (cmd.equals(Commands.taskFinished))
 			onSlaverTaskFinished(p);	else
-		if( cmd.equals(Commands.taskAssign) )
+		if (cmd.equals(Commands.taskAssign))
 			onTaskAssigned(p);	else
-		if( cmd.equals(Commands.downloadMpd) )
-			downloadMpd();
-		if( cmd.equals(Commands.transmitAcquire) )
-		{
+		if (cmd.equals(Commands.downloadMpd))
+			downloadMpd(); else
+		if (cmd.equals(Commands.transmitAcquire)) {
 			int id = Integer.valueOf(p.get("id"));
 			String path = p.get("location");
 			log("Prepare BT receive:" + String.valueOf(id) + "@" + path);
-			innet.setSavePath(id, path);
+			btNet.setSavePath(id, path);
 			PartnerInfo part = partner.get(String.valueOf(id));
 			part.transTask = p.getInt("no");
 			part.transTaskBit = p.getInt("bitrate");

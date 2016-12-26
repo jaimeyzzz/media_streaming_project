@@ -226,10 +226,8 @@ public class PlayerActivity extends Activity {
 		return true;
 	}
 	
-	void startPlay()
-	{
-		if(tProgress!=null)
-		{
+	void startPlay() {
+		if (tProgress != null) {
 			tProgress.cancel();
 			tProgress.purge();
 		}
@@ -259,10 +257,10 @@ public class PlayerActivity extends Activity {
 				});
 			}}, 0, 1000);
 
-		/*tSlowdown.schedule(new TimerTask(){
+		tSlowdown.schedule(new TimerTask(){
 			@Override
 			public void run() {
 				master.setSpdLim(50);
-			}}, 60000);*/
+			}}, 60000);
 	}
 }

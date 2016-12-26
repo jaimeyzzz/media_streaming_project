@@ -23,45 +23,44 @@ import com.lichao.bluetooth.btbasic;
 public class SlaverController extends Logable implements OnEventListener {
 
 	static String path = "/storage/sdcard0/temporary/";
-	static String mpdPath = path + "play.mpd";
+	static String mpdPath = path + "temp.mpd";
 
-			btbasic innet;
-			int now;
-			PartnerInfo me;
-			int status = 0;	// 0 : 未连接
-			// 1 : 已连接
+    btbasic innet;
+    int now;
+    PartnerInfo me;
+    int status = 0;	// 0 : 未连接, 1 : 已连接
 
-		public PartnerInfo getInfo()
-		{
-			return me;
-		}
+    public PartnerInfo getInfo()
+    {
+        return me;
+    }
 
-		Random rand = new Random();
+    Random rand = new Random();
 
-		public SlaverController()
-		{
-			now = 1;
-			innet = new btbasic(this);
-			innet.tranpre("bt");
-			me = new PartnerInfo(0);
-		/*
-		HttpDownloadModule tmp = new HttpDownloadModule();
-		tmp.downFile("http://192.168.1.222/medialab/sintel/400k/sintel_2048_2.mp4", "/storage/sdcard0/temporary/a2.mp4", this.onFileDownloaded, false);
-		httpDown.add(tmp);
-		*/
-		}
+    public SlaverController()
+    {
+        now = 1;
+        innet = new btbasic(this);
+        innet.tranpre("bt");
+        me = new PartnerInfo(0);
+    /*
+    HttpDownloadModule tmp = new HttpDownloadModule();
+    tmp.downFile("http://192.168.1.222/medialab/sintel/400k/sintel_2048_2.mp4", "/storage/sdcard0/temporary/a2.mp4", this.onFileDownloaded, false);
+    httpDown.add(tmp);
+    */
+    }
 
-		ArrayList<HttpDownloadModule> httpDown = new ArrayList<HttpDownloadModule>();
-		XmlParser xmlParser = new XmlParser();
-		//	VideoInfo videoInfo;
-		class DownloadedVideo
-		{
-			// 一个暂存信息用的结构
-			int no,bit;
-			long stTime;
-			String location;
-			public DownloadedVideo(int no,int bit,String location,long stTime)
-			{
+    ArrayList<HttpDownloadModule> httpDown = new ArrayList<HttpDownloadModule>();
+    XmlParser xmlParser = new XmlParser();
+    //	VideoInfo videoInfo;
+    class DownloadedVideo
+    {
+        // 一个暂存信息用的结构
+        int no,bit;
+        long stTime;
+        String location;
+        public DownloadedVideo(int no,int bit,String location,long stTime)
+        {
 			this.no = no;
 			this.bit = bit;
 			this.location = location;
@@ -166,7 +165,7 @@ public class SlaverController extends Logable implements OnEventListener {
 					bas += (bas&1);
 					httpDown.get(i).setSpeedLim(spdLim + rand.nextInt(bas)-(bas/2+1));
 				}
-			info.put("outBandWidth",String.valueOf(me.outBandWidth));
+			info.put("outBandWidth", String.valueOf(me.outBandWidth));
 			innet.sendinfo(info, 0, null, 0);
 		}
 	};
@@ -186,6 +185,7 @@ public class SlaverController extends Logable implements OnEventListener {
 		me.nowTask = Integer.valueOf(info.get("no"));
 		me.nowTaskBit = Integer.valueOf(info.get("bitrate"));
 		me.stTime = Long.valueOf(info.get("stTime"));
+		me.workStatus = 1;
 		String location = path + me.id + "_" + me.nowTask + "_" + me.nowTaskBit + ".mp4";
 		HttpDownloadModule tmp = new HttpDownloadModule();
 		tmp.setSpeedLim(spdLim);
@@ -203,6 +203,7 @@ public class SlaverController extends Logable implements OnEventListener {
 		httpDown.clear();
 		me.nowTask = -1;
 		me.nowTaskBit = -1;
+		me.workStatus = 0;
 	}
 	
 	public void connectMaster()

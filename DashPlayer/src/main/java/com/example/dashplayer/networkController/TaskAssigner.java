@@ -16,12 +16,9 @@ import com.example.dashplayer.common.VideoInfo;
 import com.lichao.bluetooth.btbasic;
 
 public abstract class TaskAssigner {
-	
-	class TaskRecord
-	{
-		int id,br;
-		public TaskRecord(int id, int br)
-		{
+	class TaskRecord {
+		int id, br;
+		public TaskRecord(int id, int br) {
 			this.id = id;
 			this.br = br;
 		}
@@ -44,19 +41,31 @@ public abstract class TaskAssigner {
 	FragmentPlayer player;
 	TimePair[] downloadRecord;
 	PartnerMap partner;
+	ArrayList<String> partnerAvail;
 	int bandwidth;
 	btbasic innet;
+
+	int keyFragment;
+	public void setKeyFragment(int keyFragment) {
+		this.keyFragment = keyFragment;
+	}
+	public int getKeyFragment() {
+		return this.keyFragment;
+	}
 	
-	public void reset()
-	{
+	public void reset() {
 		if(videoStatus==null)
 			videoStatus = new int[0];
-		for(int i=0;i<videoStatus.length;++i)
-			switch(videoStatus[i])
-			{
-			case 3: videoStatus[i] = 2;break;
-			case 1: videoStatus[i] = 0;break;
+		for(int i=0;i<videoStatus.length;++i) {
+			switch (videoStatus[i]) {
+				case 3:
+					videoStatus[i] = 2;
+					break;
+				case 1:
+					videoStatus[i] = 0;
+					break;
 			}
+		}
 	}
 	
 	public void informDownloaded(int no)
@@ -86,8 +95,7 @@ public abstract class TaskAssigner {
 		//return taskRecord[no].br;
 	}
 	
-	public void videoInfoBinder(VideoInfo videoInfo)
-	{
+	public void videoInfoBinder(VideoInfo videoInfo) {
 		this.videoInfo = videoInfo;
 		n = videoInfo.get(0).url.length;
 		videoStatus = new int[n];
@@ -95,7 +103,7 @@ public abstract class TaskAssigner {
 		taskRecord = new TaskRecord[n];
 		bn = videoInfo.size();
 		fragmentDuration = videoInfo.get(0).fragmentDuration;
-		qref = Math.max(10,fragmentDuration * 2 );	// 即20
+		qref = Math.max(10, fragmentDuration * 2 );	// 即20
 	}
 	
 	public void playerBinder( FragmentPlayer player)
@@ -107,20 +115,23 @@ public abstract class TaskAssigner {
 	{
 		this.downloadRecord = downloadRecord;
 	}
-	
+
 	public void partnerBinder(	PartnerMap partner )
 	{
 		this.partner = partner;
 	}
-	
+	public void partnerAvailBinder(ArrayList<String> partnerAvail) {
+		this.partnerAvail = partnerAvail;
+	}
+
 	public void networkBinder( btbasic innet)
 	{
 		this.innet = innet;
 	}
-	
+
 	abstract public void assignTask(PartnerInfo p);
 	abstract public int getSelectedBitrate();
-	
+
 	public void onPartnerLost(String p)
 	{
 		PartnerInfo info = partner.get(p);
@@ -129,10 +140,8 @@ public abstract class TaskAssigner {
 			if(videoStatus[i] == 1 && videoDownloadee[i] == id)
 				videoStatus[i] = 0;
 	}
-	
-	public void fileDownloaded(int p)
-	{
+
+	public void fileDownloaded(int p) {
 		videoStatus[p] = 2;
 	}
-	
 }
