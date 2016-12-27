@@ -184,7 +184,7 @@ public class MasterController extends Logable implements OnEventListener {
 		nowBandwidth2 = innerSpd;
 		return tot;
 	}
-2
+
 	public int getNowBitrate()
 	{
 		return assigner.getSelectedBitrate();
