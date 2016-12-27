@@ -3,6 +3,7 @@ package com.example.dashplayer.networkController;
 import java.net.Socket;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,9 +26,12 @@ public class SlaverController extends Logable implements OnEventListener {
 	static String path = "/storage/sdcard0/temporary/";
 	static String mpdPath = path + "temp.mpd";
 
+	static int bandWidthQueueSize = 10;
+
     btbasic innet;
     int now;
     PartnerInfo me;
+	Queue<Integer> bandWidthQueue = new ArrayDeque<Integer>();
     int status = 0;	// 0 : 未连接, 1 : 已连接
 
     public PartnerInfo getInfo()
@@ -147,6 +151,15 @@ public class SlaverController extends Logable implements OnEventListener {
 			return;
 		int tot = 0;
 		tot = httpDown.get(httpDown.size()-1).getNowSpeed();
+		bandWidthQueue.offer(tot);
+		if (bandWidthQueue.size() > bandWidthQueueSize) {
+			bandWidthQueue.poll();
+		}
+		tot = 0;
+		for (Integer iter : bandWidthQueue) {
+			tot += iter;
+		}
+		tot = (int)(tot / (double)bandWidthQueue.size());
 		me.outBandWidth = tot;
 	}
 	

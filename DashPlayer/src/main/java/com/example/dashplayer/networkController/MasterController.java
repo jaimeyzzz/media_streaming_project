@@ -1,12 +1,14 @@
 package com.example.dashplayer.networkController;
 
 import java.net.Socket;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Queue;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -42,6 +44,7 @@ public class MasterController extends Logable implements OnEventListener {
 	static String mpdUrl = "http://114.215.41.77/sintel/test.mpd";
 	static int maxTruncNum = 1000000;
 	static int minDownloadSpeed = 10;
+    static int bandWidthQueueSize = 10;
 //	public Integer downloading = -1;
 
 	/* partner info */
@@ -76,6 +79,7 @@ public class MasterController extends Logable implements OnEventListener {
 	
 	TimePair[] downloadRecord;
 	BatteryUtilities battery;
+    Queue<Integer> bandWidthQueue = new ArrayDeque<Integer>();
 	int nowBandwidth, nowBandwidth2;
 	
 	// other initial classes;
@@ -94,7 +98,7 @@ public class MasterController extends Logable implements OnEventListener {
 		battery = new BatteryUtilities(activity);
 		player = _player;
 
-		assigner = new TaskAssignerCourse(this);
+		assigner = new TaskAssignerSimple(this);
 		assigner.playerBinder(player);
 		assigner.partnerBinder(partner);
 		assigner.networkBinder(btNet);
@@ -165,12 +169,22 @@ public class MasterController extends Logable implements OnEventListener {
 		}
 		btSpeed = btNet.getSpeed();
 		log("http:"+tot+";inner:"+innerSpd);
-		assigner.notifyBandwidth(tot +  innerSpd);
+        bandWidthQueue.offer(tot);
+        if (bandWidthQueue.size() > bandWidthQueueSize) {
+            bandWidthQueue.poll();
+        }
+        tot = 0;
+        for (Integer iter : bandWidthQueue) {
+            tot += iter;
+        }
+        tot = (int)(tot / (double)bandWidthQueue.size());
+        assigner.notifyBandwidth(tot + innerSpd);
+		partner.get("0").outBandWidth = tot;
 		nowBandwidth = tot;
 		nowBandwidth2 = innerSpd;
 		return tot;
 	}
-	
+2
 	public int getNowBitrate()
 	{
 		return assigner.getSelectedBitrate();

@@ -257,10 +257,10 @@ public class PlayerActivity extends Activity {
 				});
 			}}, 0, 1000);
 
-		tSlowdown.schedule(new TimerTask(){
+		/*tSlowdown.schedule(new TimerTask(){
 			@Override
 			public void run() {
 				master.setSpdLim(50);
-			}}, 60000);
+			}}, 60000);*/
 	}
 }

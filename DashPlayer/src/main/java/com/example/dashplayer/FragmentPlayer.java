@@ -276,7 +276,6 @@ public class FragmentPlayer extends Fragment implements OnClickListener, FFmpegL
 				}
 			});
 
-
 			nowPlaying = 0;
 			status = 0;
 			playLst = new String[n];

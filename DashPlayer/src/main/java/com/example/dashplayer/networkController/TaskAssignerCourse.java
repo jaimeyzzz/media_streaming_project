@@ -12,7 +12,9 @@ public class TaskAssignerCourse extends TaskAssigner {
 	public TaskAssignerCourse(OnEventListener evnt) {
 		evntMain = evnt;
 	}
-	
+
+
+	// TODO：partner speed -> 0;
 	/**
 	 * @param p			partner
 	 */
@@ -49,6 +51,9 @@ public class TaskAssignerCourse extends TaskAssigner {
 				fragIdx += taskNum;
 			}
 		}
+		else if (p.id != 0) {
+			fragIdx = fragIdx + partnerAvail.size();
+		}
 		for (int i = fragIdx; i < n; i ++) {
 			if (videoStatus[i] == 0)
 				break;
@@ -58,12 +63,10 @@ public class TaskAssignerCourse extends TaskAssigner {
 		// status == 1 : task to do
 		videoStatus[fragIdx] = 1;
 
-
-
         p.nowTask = fragIdx;
-        if (fragIdx >= keyFragment) {
+        //if (fragIdx >= keyFragment) {
             lastBitrate = bitrate;
-        }
+        //}
         p.nowTaskBit = lastBitrate;
         downloadRecord[fragIdx] = new TimePair();
         downloadRecord[fragIdx].bufStTime = player.getBufferedLength();
@@ -108,8 +111,9 @@ public class TaskAssignerCourse extends TaskAssigner {
             if(p<videoInfo.get(minn).bitrate)
                 minn = i;
         }
-        lastBitrate = ( res == -1?minn:res);
-        return lastBitrate;
+		int bitrate = ( res == -1?minn:res);
+		System.out.println(bitrate);
+        return bitrate;
     }
 	@Override
 	public int getSelectedBitrate() {

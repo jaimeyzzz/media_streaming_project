@@ -78,7 +78,7 @@ public class ContactList extends Fragment {
         logger = new LoggerTextviewMatlab(this.getActivity(), tLog);
         slaver = new SlaverController();
         slaver.bindOnLogEvent(logger);
-        slaver.setLimSpd(15);
+        slaver.setLimSpd(40);
 		slaver.connectMaster();
 		tProgress.schedule(new TimerTask(){
 			@Override
