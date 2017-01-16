@@ -46,6 +46,7 @@ public abstract class TaskAssigner {
 	btbasic innet;
 
 	int keyFragment;
+	public int[] fragmentBitrate = new int[0];
 	public void setKeyFragment(int keyFragment) {
 		this.keyFragment = keyFragment;
 	}
@@ -101,6 +102,7 @@ public abstract class TaskAssigner {
 		videoStatus = new int[n];
 		videoDownloadee = new int[n];
 		taskRecord = new TaskRecord[n];
+		fragmentBitrate = new int[n];
 		bn = videoInfo.size();
 		fragmentDuration = videoInfo.get(0).fragmentDuration;
 		qref = Math.max(10, fragmentDuration * 2 );	// 即20

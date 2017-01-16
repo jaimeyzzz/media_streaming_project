@@ -1,9 +1,14 @@
 package com.example.dashplayer.networkController;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.RandomAccessFile;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Comparator;
 import java.util.Iterator;
@@ -98,12 +103,12 @@ public class MasterController extends Logable implements OnEventListener {
 		battery = new BatteryUtilities(activity);
 		player = _player;
 
-		assigner = new TaskAssignerSimple(this);
+		assigner = new TaskAssignerCourse(this);
 		assigner.playerBinder(player);
 		assigner.partnerBinder(partner);
 		assigner.networkBinder(btNet);
 		assigner.partnerAvailBinder(partnerAvail);
-//		localHost.onFileRecv = onFileInnerDownloaded;		
+//		localHost.onFileRecv = onFileInnerDownloaded;		2
 
 		// TODO : create path directory;
 		// add localhost as a partner
@@ -150,7 +155,40 @@ public class MasterController extends Logable implements OnEventListener {
                     assigner.videoStatus[p.nowTask] = 0;
             }
         }*/
-	}
+
+        // log infomation;
+        String logFileName = "/storage/sdcard0/DecmodLog/" + "log.txt";
+
+        try {
+            File targetFile = new File(logFileName);
+            File parent = targetFile.getParentFile();
+            if(!parent.exists() && !parent.mkdirs()){
+                return;
+            }
+            if(!targetFile.exists() && !targetFile.createNewFile()) {
+                return;
+            }
+
+            RandomAccessFile fout = new RandomAccessFile(targetFile, "rw");
+            fout.seek(targetFile.length());
+
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+            Date date = new Date(System.currentTimeMillis());
+
+            String str = formatter.format(date) + " ";
+            str += String.valueOf(nowBandwidth) + " " + String.valueOf(nowBandwidth2) + " ";
+            str += String.valueOf(player.nowPlaying) ;
+            if (assigner.fragmentBitrate.length > 0 && player.nowPlaying >= 0) {
+                str += " " + String.valueOf(assigner.fragmentBitrate[player.nowPlaying]);
+            }
+            str += "\n";
+            fout.write(str.getBytes());
+            fout.close();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+    }
 	
 	public int getBatteryLevel() {
 		return (int)(battery.getBatteryPercent() * 100);
@@ -165,6 +203,8 @@ public class MasterController extends Logable implements OnEventListener {
 		Iterator<Entry<String, PartnerInfo>> i = partner.entrySet().iterator();
 		while(i.hasNext()) {
 			Entry<String, PartnerInfo> p = i.next();
+            if (p.getValue().id == 0)
+                continue;
 			innerSpd += p.getValue().outBandWidth;
 		}
 		btSpeed = btNet.getSpeed();
@@ -179,7 +219,8 @@ public class MasterController extends Logable implements OnEventListener {
         }
         tot = (int)(tot / (double)bandWidthQueue.size());
         assigner.notifyBandwidth(tot + innerSpd);
-		partner.get("0").outBandWidth = tot;
+        if (httpDown.size() > 0)
+            partner.get("0").outBandWidth = tot;
 		nowBandwidth = tot;
 		nowBandwidth2 = innerSpd;
 		return tot;

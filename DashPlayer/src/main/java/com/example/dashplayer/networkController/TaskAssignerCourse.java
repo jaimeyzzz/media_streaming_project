@@ -64,13 +64,15 @@ public class TaskAssignerCourse extends TaskAssigner {
 		videoStatus[fragIdx] = 1;
 
         p.nowTask = fragIdx;
-        //if (fragIdx >= keyFragment) {
+        if (fragIdx >= keyFragment) {
             lastBitrate = bitrate;
-        //}
+        }
         p.nowTaskBit = lastBitrate;
         downloadRecord[fragIdx] = new TimePair();
         downloadRecord[fragIdx].bufStTime = player.getBufferedLength();
 		downloadRecord[fragIdx].bitrate = bitrate;
+
+        fragmentBitrate[fragIdx] = lastBitrate;
 		postTask(p);
 
 	}

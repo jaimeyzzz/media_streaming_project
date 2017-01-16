@@ -85,6 +85,7 @@ public class TaskAssignerSimple extends TaskAssigner {
 		p.nowTaskBit = bitrate;
 		lastBitrate = bitrate;
 		downloadRecord[no].bitrate = bitrate;
+		fragmentBitrate[no] = bitrate;
 		postTask(p);
 	}
 
